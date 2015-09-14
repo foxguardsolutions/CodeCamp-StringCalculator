@@ -46,5 +46,24 @@ namespace StringCalculator
         {
             Assert.AreEqual(sum, StringCalculator.Add(numbers));
         }
+
+        [TestCase("1,1001", 1)]
+        [TestCase("1005,10000", 0)]
+        public void AddIgnoresNumbersGreaterThanOneThousand(string numbers, int sum)
+        {
+            Assert.AreEqual(sum, StringCalculator.Add(numbers));
+        }
+
+        [TestCase("//[xxx]\n1xxx5", 6)]
+        public void DelemitersCanBeOfAnyLength(string numbers, int sum)
+        {
+            Assert.AreEqual(sum, StringCalculator.Add(numbers));
+        }
+
+        [TestCase("//[xx][yy]\n1xx2yy3", 6)]
+        public void AddAllowsMultipleMultiDigitDelimiters(string numbers, int sum)
+        {
+            Assert.AreEqual(sum, StringCalculator.Add(numbers));
+        }
     }
 }

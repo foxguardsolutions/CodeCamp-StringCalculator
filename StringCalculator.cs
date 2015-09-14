@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace StringCalculator
@@ -11,15 +12,15 @@ namespace StringCalculator
 
         public static int Add(string numbers)
         {
-            char[] delims = new char[] { ',', '\n' };
+            string[] delims = new string[] { ",", "\n" };
             if (numbers.StartsWith("//") && numbers.Contains('\n'))
             {
-                int end = numbers.IndexOf('\n') - 2;
-                delims = numbers.Substring(2, end).ToCharArray();
-                numbers = numbers.Substring(numbers.IndexOf('\n') + 1);
+                int end = numbers.IndexOf('\n') + 1;
+                delims = GetDelimiters(numbers.Substring(0, end));
+                numbers = numbers.Substring(end);
             }
 
-            return numbers.Split(delims).Select(ConvertToNumber).Sum();
+            return numbers.Split(delims, StringSplitOptions.RemoveEmptyEntries).Select(ConvertToNumber).Sum();
         }
 
         public static int ConvertToNumber(string number)
@@ -34,8 +35,42 @@ namespace StringCalculator
             {
                 throw new ArgumentException("Negatives are not allowed", "number");
             }
+            else if (integerValue > 1000)
+            {
+                return 0;
+            }
 
             return integerValue;
+        }
+
+        public static string[] GetDelimiters(string delimiterString)
+        {
+            List<string> delims = new List<string>(new string[] { ",", "\n" });
+
+            if (delimiterString.StartsWith("//") && delimiterString.EndsWith("\n"))
+            {
+                delims = new List<string>(new string[] { string.Empty });
+                delimiterString = delimiterString.Trim(new char[] { '/', '\n' });
+                bool multiChar = false;
+                foreach (char x in delimiterString)
+                {
+                    delims[delims.Count() - 1] += x;
+                    delims[delims.Count() - 1] = delims[delims.Count() - 1].Trim('[', ']');
+                    if (!multiChar)
+                    {
+                        delims.Add(string.Empty);
+                        multiChar = x == '[';
+                    }
+                    else
+                    {
+                        multiChar = x != ']';
+                    }
+                }
+            }
+
+            delims.Remove(string.Empty);
+
+            return delims.ToArray();
         }
     }
 }
