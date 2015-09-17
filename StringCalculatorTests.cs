@@ -41,7 +41,7 @@ namespace StringCalculator
         }
 
         [TestCase("-1", 0)]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void AddDoesNotAllowNegatives(string numbers, int sum)
         {
             Assert.AreEqual(sum, StringCalculator.Add(numbers));
@@ -60,7 +60,7 @@ namespace StringCalculator
             Assert.AreEqual(sum, StringCalculator.Add(numbers));
         }
 
-        [TestCase("//[xx][yy]\n1xx2yy3", 6)]
+        [TestCase("//[xx][yy][zz]abc\n1xx2yy3", 6)]
         public void AddAllowsMultipleMultiDigitDelimiters(string numbers, int sum)
         {
             Assert.AreEqual(sum, StringCalculator.Add(numbers));

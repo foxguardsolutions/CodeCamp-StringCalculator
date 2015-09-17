@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace StringCalculator
 {
@@ -13,14 +14,37 @@ namespace StringCalculator
         public static int Add(string numbers)
         {
             string[] delims = new string[] { ",", "\n" };
-            if (numbers.StartsWith("//") && numbers.Contains('\n'))
+            Regex matcher = new Regex("^//(\\[.*?\\]|.)*\n(.*)");
+
+            if (matcher.IsMatch(numbers))
             {
-                int end = numbers.IndexOf('\n') + 1;
-                delims = GetDelimiters(numbers.Substring(0, end));
-                numbers = numbers.Substring(end);
+                delims = GetDelimiters(numbers, matcher);
+                numbers = GetAdditionString(numbers, matcher);
             }
 
-            return numbers.Split(delims, StringSplitOptions.RemoveEmptyEntries).Select(ConvertToNumber).Sum();
+            return GetAllNumbers(numbers, delims).Sum();
+        }
+
+        public static List<int> GetAllNumbers(string numberString, string[] delimiters)
+        {
+            List<int> numbersList =
+                numberString
+                .Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
+                .Select(ConvertToNumber)
+                .ToList();
+            if (numbersList.Any(x => x < 0))
+            {
+                int[] negatives = numbersList.Where(x => x < 0).ToArray();
+                string format = "I don't know how to add negatives: ";
+                foreach (int negative in negatives)
+                {
+                    format += string.Format("{0} ", negative);
+                }
+
+                throw new ArgumentOutOfRangeException(format);
+            }
+
+            return numbersList;
         }
 
         public static int ConvertToNumber(string number)
@@ -31,11 +55,7 @@ namespace StringCalculator
             }
 
             int integerValue = Convert.ToInt32(number, 10);
-            if (integerValue < 0)
-            {
-                throw new ArgumentException("Negatives are not allowed", "number");
-            }
-            else if (integerValue > 1000)
+            if (integerValue > 1000)
             {
                 return 0;
             }
@@ -43,34 +63,17 @@ namespace StringCalculator
             return integerValue;
         }
 
-        public static string[] GetDelimiters(string delimiterString)
+        public static string GetAdditionString(string fullNumberString, Regex matcher)
         {
-            List<string> delims = new List<string>(new string[] { ",", "\n" });
+            MatchCollection matches = matcher.Matches(fullNumberString);
+            return matches[0].Groups[2].Value;
+        }
 
-            if (delimiterString.StartsWith("//") && delimiterString.EndsWith("\n"))
-            {
-                delims = new List<string>(new string[] { string.Empty });
-                delimiterString = delimiterString.Trim(new char[] { '/', '\n' });
-                bool multiChar = false;
-                foreach (char x in delimiterString)
-                {
-                    delims[delims.Count() - 1] += x;
-                    delims[delims.Count() - 1] = delims[delims.Count() - 1].Trim('[', ']');
-                    if (!multiChar)
-                    {
-                        delims.Add(string.Empty);
-                        multiChar = x == '[';
-                    }
-                    else
-                    {
-                        multiChar = x != ']';
-                    }
-                }
-            }
-
-            delims.Remove(string.Empty);
-
-            return delims.ToArray();
+        public static string[] GetDelimiters(string fullNumberString, Regex matcher)
+        {
+            MatchCollection matches = matcher.Matches(fullNumberString);
+            List<string> delimiters = (from object capture in matches[0].Groups[1].Captures select capture.ToString()).ToList();
+            return delimiters.Select(x => x.Trim('[', ']')).ToArray();
         }
     }
 }
