@@ -7,10 +7,22 @@ using System.Threading.Tasks;
 namespace StringCalculator {
     public class Calculator {
         private static char[] defaultDelimiters = { ',', '\n' };
+        public const string NEGATIVESNOTALLOWED = "Negatives not allowed: -1";
 
         public int Add(string input) {
             var addends = ParseInputToInts(input);
+            ValidateNumbers(addends);
             return addends.Sum();
+        }
+
+        private void ValidateNumbers(IEnumerable<int> addends) {
+            if (HasNegativeNumbers(addends)) {
+                throw new ArgumentException(NEGATIVESNOTALLOWED);
+            }
+        }
+
+        private bool HasNegativeNumbers(IEnumerable<int> addends) {
+            return addends.Any(a => a < 0);
         }
 
         private IEnumerable<int> ParseInputToInts(string input) {
