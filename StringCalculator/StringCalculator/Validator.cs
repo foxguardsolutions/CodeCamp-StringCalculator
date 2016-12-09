@@ -8,7 +8,18 @@ namespace StringCalculator
     {
         private const string NEGATIVESNOTALLOWED = "Negatives not allowed: ";
 
-        public void ValidateNumbers(IEnumerable<int> numbers)
+        public IEnumerable<int> Validate(IEnumerable<int> numbers)
+        {
+            CheckForNegatives(numbers);
+            return RemoveTooLarge(numbers);
+        }
+
+        private IEnumerable<int> RemoveTooLarge(IEnumerable<int> numbers)
+        {
+            return numbers.Where(number => number < 1001);
+        }
+
+        private void CheckForNegatives(IEnumerable<int> numbers)
         {
             var negativeNumbers = GetNegativeNumbers(numbers);
             if (negativeNumbers.Any())

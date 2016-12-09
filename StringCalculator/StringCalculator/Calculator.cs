@@ -9,7 +9,7 @@ namespace StringCalculator
             var parser = new InputParser();
             var numberValidator = new Validator();
             var addends = parser.ParseToInts(input);
-            numberValidator.ValidateNumbers(addends);
+            addends = numberValidator.Validate(addends);
             return addends.Sum();
         }
     }

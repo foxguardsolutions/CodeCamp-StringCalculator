@@ -11,6 +11,7 @@ namespace StringCalculator.Tests
         [TestCase("0", 0)]
         [TestCase("1,1", 2)]
         [TestCase("1,1,1,2", 5)]
+        [TestCase("2,1001", 2)]
         public void Add_Returns(string input, int expectedSum)
         {
             var testCalculator = new Calculator();

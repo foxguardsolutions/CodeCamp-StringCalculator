@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace StringCalculator.Tests
@@ -14,8 +14,17 @@ namespace StringCalculator.Tests
         {
             var testValidator = new Validator();
             Assert.That(
-                () => { testValidator.ValidateNumbers(numbers); },
+                () => { testValidator.Validate(numbers); },
                 Throws.ArgumentException.With.Property("Message").EqualTo(exceptionMessage));
+        }
+
+        [Test]
+        [TestCase(new int[] { 1, 2 }, new int[] { 1, 2 })]
+        [TestCase(new int[] { 2, 1001 }, new int[] { 2 })]
+        public void ValidateNumbers_Returns(int[] numbers, IEnumerable<int> expectedResult)
+        {
+            var testValidator = new Validator();
+            Assert.That(testValidator.Validate(numbers), Is.EqualTo(expectedResult));
         }
     }
 }
