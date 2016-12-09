@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace StringCalculator {
     public class Calculator {
+        private static char[] inputDelimiters = { ',', '\n' };
+
         public int Add(string numbers) {
             var addends = ParseStringToInts(numbers);
             return addends.Sum();
         }
 
         private IEnumerable<int> ParseStringToInts(string numbers) {
-            var splitNumbers = numbers.Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            var splitNumbers = numbers.Split(inputDelimiters, StringSplitOptions.RemoveEmptyEntries);
             return ConvertMembersToInts(splitNumbers);
         }
 
