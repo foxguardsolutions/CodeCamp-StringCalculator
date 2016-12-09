@@ -12,6 +12,7 @@ namespace StringCalculator.tests
     {
         [Test]
         [TestCase("", 0)]
+        [TestCase("1", 1)]
         public void Add_Returns(string numbers, int expectedSum) {
             var testCalculator = new Calculator();
             Assert.That(testCalculator.Add(numbers), Is.EqualTo(expectedSum));
