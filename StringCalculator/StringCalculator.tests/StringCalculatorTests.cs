@@ -17,6 +17,7 @@ namespace StringCalculator.tests
         [TestCase("1,1", 2)]
         [TestCase("1,1,1,2", 5)]
         [TestCase("1\n2,3", 6)]
+        [TestCase("//;\n1;2", 3)]
         public void Add_Returns(string numbers, int expectedSum) {
             var testCalculator = new Calculator();
             Assert.That(testCalculator.Add(numbers), Is.EqualTo(expectedSum));
