@@ -14,6 +14,7 @@ namespace StringCalculator.Tests
         [TestCase("1,1,1,2", new int[] { 1, 1, 1, 2 })]
         [TestCase("1\n2,3", new int[] { 1, 2, 3 })]
         [TestCase("//;\n1;2", new int[] { 1, 2 })]
+        [TestCase("//[***]\n1***2***3", new int[] { 1, 2, 3 })]
         public void ParseToInts_Returns(string input, IEnumerable<int> expectedIEnumerable)
         {
             var testParser = new InputParser();
