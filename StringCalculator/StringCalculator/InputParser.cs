@@ -7,14 +7,18 @@ namespace StringCalculator
     public class InputParser
     {
         private static string[] defaultDelimiters = { ",", "\n" };
+        private static string customDelimiterIndicator = "//";
+        private static string complexCustomDelimiterIndicator = "//[";
+        private static string complexCustomDelimiterTerminator = "]\n";
+        private static string complexCustomDelimiterSeparator = "][";
 
         public IEnumerable<int> ParseToInts(string input)
         {
-            var splitNumbers = SplitInupt(input);
+            var splitNumbers = SplitInput(input);
             return ConvertMembersToInts(splitNumbers);
         }
 
-        private string[] SplitInupt(string input)
+        private string[] SplitInput(string input)
         {
             var delimiters = GetDelimiters(input);
             var numbers = GetNumbers(input);
@@ -31,7 +35,7 @@ namespace StringCalculator
         {
             if (StringSpecifiesDelimiters(input))
             {
-                return ExtractDelimiterFromSpecification(input);
+                return ExtractDelimitersFromSpecification(input);
             }
 
             return defaultDelimiters;
@@ -50,39 +54,41 @@ namespace StringCalculator
 
         private bool StringSpecifiesDelimiters(string input)
         {
-            return input.StartsWith("//");
+            return input.StartsWith(customDelimiterIndicator);
         }
 
         private int GetStartPositionOfNumbers(string input)
         {
-            if (input.Contains("]\n"))
+            if (input.Contains(complexCustomDelimiterTerminator))
             {
-                return input.IndexOf("]\n") + 2;
+                return input.IndexOf(complexCustomDelimiterTerminator) + complexCustomDelimiterTerminator.Length;
             }
 
-            return 4;
+            var simpleCustomDelimiterAndTerminatorLength = 2;
+            return customDelimiterIndicator.Length + simpleCustomDelimiterAndTerminatorLength;
         }
 
-        private string[] ExtractDelimiterFromSpecification(string input)
+        private string[] ExtractDelimitersFromSpecification(string input)
         {
-            if (StringSpecifiesMulticharacterDelimiter(input))
+            if (StringSpecifiesComplexDelimiters(input))
             {
-                return new string[] { GetMulticharacterDelimiter(input) };
+                return GetComplexDelimiters(input);
             }
 
-            return new string[] { input[2].ToString() };
+            return new string[] { input[customDelimiterIndicator.Length].ToString() };
         }
 
-        private bool StringSpecifiesMulticharacterDelimiter(string input)
+        private bool StringSpecifiesComplexDelimiters(string input)
         {
-            return input.StartsWith("//[");
+            return input.StartsWith(complexCustomDelimiterIndicator);
         }
 
-        private string GetMulticharacterDelimiter(string input)
+        private string[] GetComplexDelimiters(string input)
         {
-            var start = 3;
-            var length = input.IndexOf("]") - start;
-            return input.Substring(start, length);
+            var start = complexCustomDelimiterIndicator.Length;
+            var length = input.IndexOf(complexCustomDelimiterTerminator) - start;
+            var complexDelimiterText = input.Substring(start, length);
+            return complexDelimiterText.Split(new string[] { complexCustomDelimiterSeparator }, StringSplitOptions.RemoveEmptyEntries).ToArray();
         }
     }
 }

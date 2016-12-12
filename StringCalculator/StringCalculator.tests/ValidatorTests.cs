@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace StringCalculator.Tests
@@ -13,9 +14,7 @@ namespace StringCalculator.Tests
         public void ValidateNumbers_ThrowsException(int[] numbers, string exceptionMessage)
         {
             var testValidator = new Validator();
-            Assert.That(
-                () => { testValidator.Validate(numbers); },
-                Throws.ArgumentException.With.Property("Message").EqualTo(exceptionMessage));
+            Assert.Throws<ArgumentException>(() => { testValidator.Validate(numbers); }, exceptionMessage);
         }
 
         [Test]
@@ -24,7 +23,8 @@ namespace StringCalculator.Tests
         public void ValidateNumbers_Returns(int[] numbers, IEnumerable<int> expectedResult)
         {
             var testValidator = new Validator();
-            Assert.That(testValidator.Validate(numbers), Is.EqualTo(expectedResult));
+            var validatedNumbers = testValidator.Validate(numbers);
+            Assert.That(validatedNumbers, Is.EqualTo(expectedResult));
         }
     }
 }

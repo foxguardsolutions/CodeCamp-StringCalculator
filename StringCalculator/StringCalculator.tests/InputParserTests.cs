@@ -15,10 +15,12 @@ namespace StringCalculator.Tests
         [TestCase("1\n2,3", new int[] { 1, 2, 3 })]
         [TestCase("//;\n1;2", new int[] { 1, 2 })]
         [TestCase("//[***]\n1***2***3", new int[] { 1, 2, 3 })]
-        public void ParseToInts_Returns(string input, IEnumerable<int> expectedIEnumerable)
+        [TestCase("//[*][%]\n1*2%3", new int[] { 1, 2, 3 })]
+        public void ParseToInts_Returns(string input, IEnumerable<int> expectedValues)
         {
             var testParser = new InputParser();
-            Assert.That(testParser.ParseToInts(input), Is.EqualTo(expectedIEnumerable));
+            var parsedValues = testParser.ParseToInts(input);
+            Assert.That(parsedValues, Is.EqualTo(expectedValues));
         }
     }
 }

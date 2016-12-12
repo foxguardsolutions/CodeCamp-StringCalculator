@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 
 namespace StringCalculator.Tests
 {
@@ -15,7 +16,8 @@ namespace StringCalculator.Tests
         public void Add_Returns(string input, int expectedSum)
         {
             var testCalculator = new Calculator();
-            Assert.That(testCalculator.Add(input), Is.EqualTo(expectedSum));
+            var calculatedSum = testCalculator.Add(input);
+            Assert.That(calculatedSum, Is.EqualTo(expectedSum));
         }
 
         [Test]
@@ -23,9 +25,7 @@ namespace StringCalculator.Tests
         public void Add_ThrowsException(string input, string exceptionMessage)
         {
             var testCalculator = new Calculator();
-            Assert.That(
-                () => { testCalculator.Add(input); },
-                Throws.ArgumentException.With.Property("Message").EqualTo(exceptionMessage));
+            Assert.Throws<ArgumentException>(() => { testCalculator.Add(input); }, exceptionMessage);
         }
     }
 }

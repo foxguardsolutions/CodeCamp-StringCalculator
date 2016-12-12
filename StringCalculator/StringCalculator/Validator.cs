@@ -21,16 +21,11 @@ namespace StringCalculator
 
         private void CheckForNegatives(IEnumerable<int> numbers)
         {
-            var negativeNumbers = GetNegativeNumbers(numbers);
+            var negativeNumbers = numbers.Where(number => number < 0);
             if (negativeNumbers.Any())
             {
                 throw new ArgumentException(NEGATIVESNOTALLOWED + string.Join(", ", negativeNumbers));
             }
-        }
-
-        private IEnumerable<int> GetNegativeNumbers(IEnumerable<int> numbers)
-        {
-            return numbers.Where(number => number < 0);
         }
     }
 }
