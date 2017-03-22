@@ -12,12 +12,11 @@ namespace StringCalculator
 
         public int Add(string numbers)
         {
-            var splitNumbers = numbers.Split(COMMA);
-            var sum = GetNumericValueFromString(splitNumbers[0]);
+            var sum = 0;
 
-            if (splitNumbers.Length > 1)
-                sum += GetNumericValueFromString(splitNumbers[1]);
-
+            foreach (var number in numbers.Split(COMMA))
+                sum += GetNumericValueFromString(number);
+            
             return sum;
         }
 

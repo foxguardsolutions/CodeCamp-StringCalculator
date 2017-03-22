@@ -32,27 +32,25 @@ namespace StringCalculator.Tests
             Assert.That(actual, Is.EqualTo(expected));
         }
 
-        [Test]
-        public void Add_GivenSingleNumberString_ReturnsIntegerValue()
+        [TestCaseSource(nameof(NumberCounts))]
+        public void Add_GivenUnknownNumberString_ReturnsSumOfNumbers(int count)
         {
-            var expected = _fixture.Create<int>();
-
-            var actual = _calculator.Add(expected.ToString());
-
-            Assert.That(actual, Is.EqualTo(expected));
-        }
-
-        [Test]
-        public void Add_GivenTwoNumberString_ReturnsSumOfNumbers()
-        {
-            var number1 = _fixture.Create<int>();
-            var number2 = _fixture.Create<int>();
-            var numbers = number1 + "," + number2;
-            var expected = number1 + number2;
+            var ints = _fixture.CreateMany<int>(count: count);
+            var numbers = string.Join(",", ints);
+            var expected = ints.Sum();
 
             var actual = _calculator.Add(numbers);
 
             Assert.That(actual, Is.EqualTo(expected));
         }       
+
+        private static IEnumerable<int> NumberCounts()
+        {
+            yield return 1;
+            yield return 2;
+            yield return 3;
+            yield return 5;
+            yield return 10;
+        }
     }
 }
