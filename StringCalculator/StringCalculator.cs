@@ -9,12 +9,13 @@ namespace StringCalculator
     public class StringCalculator
     {
         private const char COMMA = ',';
+        private const char NEW_LINE = '\n';
 
         public int Add(string numbers)
         {
             var sum = 0;
-
-            foreach (var number in numbers.Split(COMMA))
+            
+            foreach (var number in numbers.Split(COMMA, NEW_LINE))
                 sum += GetNumericValueFromString(number);
             
             return sum;

@@ -33,7 +33,7 @@ namespace StringCalculator.Tests
         }
 
         [TestCaseSource(nameof(NumberCounts))]
-        public void Add_GivenUnknownNumberString_ReturnsSumOfNumbers(int count)
+        public void Add_GivenUnknownNumberStringWithCommaDelimiter_ReturnsSumOfNumbers(int count)
         {
             var ints = _fixture.CreateMany<int>(count: count);
             var numbers = string.Join(",", ints);
@@ -42,7 +42,33 @@ namespace StringCalculator.Tests
             var actual = _calculator.Add(numbers);
 
             Assert.That(actual, Is.EqualTo(expected));
-        }       
+        }
+
+        [TestCaseSource(nameof(NumberCounts))]
+        public void Add_GivenUnknownNumberStringWithCommaAndNewLineDelimiters_ReturnsSumOfNumbers(int count)
+        {
+            var ints = _fixture.CreateMany<int>(count: count).ToArray();
+            var numbers = "";
+            var expected = ints.Sum();
+            for (int i = 0; i < ints.Length; i++)
+                numbers += ints[i] + (i % 2 == 0 ? "," : "\n");
+
+            var actual = _calculator.Add(numbers);
+
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        [TestCaseSource(nameof(NumberCounts))]
+        public void Add_GivenUnknownNumberStringWithNewLineDelimiter_ReturnsSumOfNumbers(int count)
+        {
+            var ints = _fixture.CreateMany<int>(count: count);
+            var numbers = string.Join("\n", ints);
+            var expected = ints.Sum();
+
+            var actual = _calculator.Add(numbers);
+
+            Assert.That(actual, Is.EqualTo(expected));
+        }
 
         private static IEnumerable<int> NumberCounts()
         {
