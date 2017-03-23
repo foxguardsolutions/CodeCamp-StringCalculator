@@ -8,22 +8,24 @@ namespace StringCalculator
 {
     public class StringCalculator
     {
-        private const char COMMA = ',';
-        private const char NEW_LINE = '\n';
-
-        public int Add(string numbers)
+        public int Add(string input)
         {
-            var sum = 0;
-            
-            foreach (var number in numbers.Split(COMMA, NEW_LINE))
-                sum += GetNumericValueFromString(number);
-            
-            return sum;
+            var parser = new InputParser();
+
+            if (parser.HasSpecifiedDelimiter(input))
+                parser.UpdateDelimiter(parser.GetDelimiterFromInput(input));
+
+            return AddNumbersInAString(parser.GetNumberStringFromInput(input), parser);
         }
 
-        private int GetNumericValueFromString(string number)
+        private int AddNumbersInAString(string numbers, InputParser parser)
         {
-            return string.IsNullOrWhiteSpace(number) ? 0 : int.Parse(number);
+            var sum = 0;
+
+            foreach (var number in numbers.Split(parser.GetDelimiters()))
+                sum += parser.GetNumericValueFromString(number);
+
+            return sum;
         }
     }
 }
