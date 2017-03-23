@@ -13,7 +13,8 @@ namespace StringCalculator.Tests
     public class StringCalculatorTests
     {
         private const string COMMA = ",";
-        
+
+        private string _negativeNumberMessage = "Negatives not allowed ";
         private string _newLineDelimiter;
         private Fixture _fixture;
         private StringCalculator _calculator;
@@ -21,6 +22,7 @@ namespace StringCalculator.Tests
         [SetUp]
         public void SetUp()
         {
+            _negativeNumberMessage = StringCalculator.NEGATIVE_NUMBER_MSG;
             _newLineDelimiter = InputParser.NEW_LINE_DELIMITER.ToString();
             _fixture = new Fixture();
             _calculator = new StringCalculator();
@@ -33,6 +35,34 @@ namespace StringCalculator.Tests
             var expected = 0;
 
             var actual = _calculator.Add(emptyString);
+
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        [TestCaseSource(nameof(NumberCounts))]
+        public void Add_GivenUnknownNegativeAndPositiveNumberString_ThrowsErrorForNegativeNumbers(int count)
+        {
+            var ints = _fixture.CreateManyPositiveInts(count);
+            var negativeInts = _fixture.CreateManyNegativeInts(count);
+            var both = ints.Concat(negativeInts).OrderBy(i => Math.Abs(i));
+            var numbers = string.Join(COMMA, both);
+            var expected = _negativeNumberMessage + string.Join(",", negativeInts.OrderBy(i => Math.Abs(i)));
+
+            var ex = Assert.Throws<NegativeNumberException>(() => _calculator.Add(numbers));
+            var actual = ex.Message;
+
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        [TestCaseSource(nameof(NumberCounts))]
+        public void Add_GivenUnknownNegativeNumberString_ThrowsErrorForNegativeNumbers(int count)
+        {
+            var negativeInts = _fixture.CreateManyNegativeInts(count);
+            var negativeNumbers = string.Join(COMMA, negativeInts);
+            var expected = _negativeNumberMessage + negativeNumbers;
+
+            var ex = Assert.Throws<NegativeNumberException>(() => _calculator.Add(negativeNumbers));
+            var actual = ex.Message;
 
             Assert.That(actual, Is.EqualTo(expected));
         }
@@ -60,7 +90,7 @@ namespace StringCalculator.Tests
 
             var actual = _calculator.Add(numbers);
 
-            
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         [TestCaseSource(nameof(NumberCounts))]
@@ -71,7 +101,7 @@ namespace StringCalculator.Tests
             var expected = ints.Sum();
 
             var actual = _calculator.Add(numbers);
-            
+
             Assert.That(actual, Is.EqualTo(expected));
         }
 
