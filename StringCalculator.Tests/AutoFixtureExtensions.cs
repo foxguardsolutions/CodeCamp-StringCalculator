@@ -12,14 +12,22 @@ namespace StringCalculator.Tests
     {
         private const string DIGIT_REGEX_PATTERN = @"\d";
 
+        public static IEnumerable<int> CreateManyIntsInRange(this Fixture fixture, int minValue, int maxValue, int count = 3)
+        {
+            return fixture.Build<int>().FromFactory(() => fixture.CreateIntInRange(minValue, maxValue)).CreateMany(count);
+        }
+
         public static IEnumerable<int> CreateManyNegativeInts(this Fixture fixture, int count = 3)
         {
             return fixture.Build<int>().FromFactory(() => fixture.CreateNegativeInt()).CreateMany(count);
         }
 
-        public static IEnumerable<int> CreateManyPositiveInts(this Fixture fixture, int count = 3)
+        public static int CreateIntInRange(this Fixture fixture, int minValue, int maxValue)
         {
-            return fixture.Build<int>().FromFactory(() => fixture.CreatePositiveInt()).CreateMany(count);
+            if (minValue >= maxValue)
+                throw new ArgumentException("The minimum value must be less than the maximum value");
+
+            return (fixture.Create<int>() % (maxValue - minValue)) + minValue;
         }
 
         public static int CreateNegativeInt(this Fixture fixture)
@@ -35,11 +43,6 @@ namespace StringCalculator.Tests
                 @char += Convert.ToChar(10);
 
             return @char;
-        }
-
-        public static int CreatePositiveInt(this Fixture fixture)
-        {
-            return Math.Abs(fixture.Create<int>());
         }
     }
 }

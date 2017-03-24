@@ -8,6 +8,7 @@ namespace StringCalculator
 {
     public class StringCalculator
     {
+        internal const int CALCULATOR_INPUT_UPPER_LIMIT = 1000;
         internal const string NEGATIVE_NUMBER_MSG = "Negatives not allowed ";
 
         private const string COMMA = ",";
@@ -25,15 +26,20 @@ namespace StringCalculator
 
         private int AddNumbersInAString(string numberString, InputParser parser)
         {
-            var sum = 0;
             var numbers = numberString.Split(parser.GetDelimiters());
-
+            
             VerifyNoNegativeNumbers(numbers);
 
-            foreach (var number in numbers)
-                sum += parser.GetNumericValueFromString(number);
+            var sum = numbers.Select(n => parser.GetNumericValueFromString(n))
+                .Where(n => !IsIgnoredValue(n))
+                .Sum();
 
             return sum;
+        }
+
+        private bool IsIgnoredValue(int number)
+        {
+            return number > CALCULATOR_INPUT_UPPER_LIMIT;
         }
 
         private void VerifyNoNegativeNumbers(string[] numbers)
