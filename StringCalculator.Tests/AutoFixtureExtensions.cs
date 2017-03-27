@@ -44,5 +44,15 @@ namespace StringCalculator.Tests
 
             return @char;
         }
+
+        public static string CreateStringExcludingCharSequences(this Fixture fixture, params string[] omittedSequences)
+        {
+            var str = fixture.Create<string>();
+
+            foreach (var charSequence in omittedSequences)
+                str = str.Replace(charSequence, "");
+
+            return str;
+        }
     }
 }

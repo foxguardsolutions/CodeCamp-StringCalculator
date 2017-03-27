@@ -26,7 +26,7 @@ namespace StringCalculator
 
         private int AddNumbersInAString(string numberString, InputParser parser)
         {
-            var numbers = numberString.Split(parser.GetDelimiters());
+            var numbers = numberString.Split(parser.GetDelimiters(), StringSplitOptions.None);
             
             VerifyNoNegativeNumbers(numbers);
 

@@ -8,24 +8,31 @@ namespace StringCalculator
 {
     public class InputParser
     {
-        internal const char NEW_LINE_DELIMITER = '\n';
+        internal const string DELIMITER_CLOSER = "]";
         internal const string DELIMITER_DEFINER = "//";
+        internal const string DELIMITER_OPENER = "[";
+        internal const string NEW_LINE_DELIMITER = "\n";
+        
+        private string _defaultDelimiter = ",";
 
-        private char _defaultDelimiter = ',';
-
-        public char GetDelimiterFromInput(string input)
+        public string GetDelimiterFromInput(string input)
         {
-            return input[2];
+            var delimiterIntroLength = DELIMITER_DEFINER.Length + DELIMITER_OPENER.Length;
+            var delimiter = HasSpecifiedMultiCharDelimiter(input) ?
+                input.Substring(delimiterIntroLength, input.IndexOf(DELIMITER_CLOSER) - delimiterIntroLength) :
+                input.Substring(DELIMITER_DEFINER.Length, 1);
+            
+            return delimiter;
         }
 
-        public char[] GetDelimiters()
+        public string[] GetDelimiters()
         {
-            return new char[] { _defaultDelimiter, NEW_LINE_DELIMITER };
+            return new string[] { _defaultDelimiter, NEW_LINE_DELIMITER };
         }
 
         public string GetNumberStringFromInput(string input)
         {
-            return HasSpecifiedDelimiter(input) ? input.Substring(4) : input;
+            return input.Substring(GetDelimiterDefinitionLength(input));
         }
 
         public int GetNumericValueFromString(string number)
@@ -38,7 +45,21 @@ namespace StringCalculator
             return input.StartsWith(DELIMITER_DEFINER);
         }
 
-        public void UpdateDelimiter(char delimiter)
+        private int GetDelimiterDefinitionLength(string input)
+        {
+            var delimiterExitLength = DELIMITER_CLOSER.Length + NEW_LINE_DELIMITER.Length;
+            return HasSpecifiedMultiCharDelimiter(input) ? input.IndexOf(DELIMITER_CLOSER + NEW_LINE_DELIMITER) + delimiterExitLength :
+                   HasSpecifiedDelimiter(input) ? input.IndexOf(NEW_LINE_DELIMITER) + NEW_LINE_DELIMITER.Length : 0;
+        }
+
+        private bool HasSpecifiedMultiCharDelimiter(string input)
+        {
+            return HasSpecifiedDelimiter(input)
+                && input.Substring(DELIMITER_DEFINER.Length, DELIMITER_OPENER.Length) == DELIMITER_OPENER
+                && input.Contains(DELIMITER_CLOSER);
+        }
+
+        public void UpdateDelimiter(string delimiter)
         {
             _defaultDelimiter = delimiter;
         }
