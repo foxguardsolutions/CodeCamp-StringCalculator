@@ -16,15 +16,25 @@ namespace StringCalculator.Tests
         private string[] _illegalDelimiters;
         private Fixture _fixture;
         private InputParser _parser;
-
+        
         [SetUp]
         public void SetUp()
         {
             _defaultDelimiter = InputParser.DEFAULT_DELIMITER;
-            _newLineDelimiter = InputParser.NEW_LINE_DELIMITER.ToString();
-            _illegalDelimiters = new[] { InputParser.DELIMITER_OPENER, InputParser.DELIMITER_CLOSER };
+            _newLineDelimiter = InputParser.NEW_LINE_DELIMITER;
+            _illegalDelimiters = new string[] { InputParser.DELIMITER_OPENER, InputParser.DELIMITER_CLOSER };
             _fixture = new Fixture();
             _parser = new InputParser();
+        }
+
+        [Test]
+        public void GetDelimiters_GivenUnchangedParser_ReturnsDefaultDelimiters()
+        {
+            var expected = new[] { _defaultDelimiter, _newLineDelimiter };
+
+            var actual = _parser.GetDelimiters();
+
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         [Test]
@@ -64,11 +74,12 @@ namespace StringCalculator.Tests
         }
 
         [Test]
-        public void GetDelmiters_GivenUnchangedParser_ReturnsDefaultDelimiters()
+        public void GetDelimitersFromInput_GivenMultipleMultiCharDelimiters_ReturnsDelimiters()
         {
-            var expected = new[] { _defaultDelimiter, _newLineDelimiter };
+            var expected = _fixture.CreateManyStringsExcludingCharSequences(_illegalDelimiters);
+            var delimiterString = TestDataGenerator.GetDelimiterString(expected);
 
-            var actual = _parser.GetDelimiters();
+            var actual = _parser.GetDelimitersFromInput(delimiterString);
 
             Assert.That(actual, Is.EqualTo(expected));
         }
@@ -91,8 +102,23 @@ namespace StringCalculator.Tests
             var delimiterString = TestDataGenerator.GetDelimiterString(delimiters);
             var ints = _fixture.CreateMany<int>();
             var expected = TestDataGenerator.GetNumberString(ints, delimiters);
+            var input = delimiterString + expected;
 
-            var actual = _parser.GetNumberStringFromInput(delimiterString + expected);
+            var actual = _parser.GetNumberStringFromInput(input);
+
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void GetNumberStringFromInput_GivenStringOfNumbersWithMultipleSpecifiedMultiCharDelimiters_ReturnsStringOfNumbers()
+        {
+            var delimiters = _fixture.CreateManyStringsExcludingCharSequences(_illegalDelimiters);
+            var delimiterString = TestDataGenerator.GetDelimiterString(delimiters);
+            var ints = _fixture.CreateMany<int>();
+            var expected = TestDataGenerator.GetNumberString(ints, delimiters);
+            var input = delimiterString + expected;
+
+            var actual = _parser.GetNumberStringFromInput(input);
 
             Assert.That(actual, Is.EqualTo(expected));
         }
@@ -181,7 +207,18 @@ namespace StringCalculator.Tests
         [Test]
         public void HasSpecifiedDelimiter_GivenMultipleDelimitersString_ReturnsTrue()
         {
-            var delimiters = _fixture.CreateManyNonDigitChars();
+           var delimiters = _fixture.CreateManyNonDigitChars();
+            var input = TestDataGenerator.GetDelimiterString(delimiters);
+
+            var actual = _parser.HasSpecifiedDelimiter(input);
+
+            Assert.That(actual, Is.True);
+        }
+
+        [Test]
+        public void HasSpecifiedDelimiter_GivenMultipleMultiCharDelimitersString_ReturnsTrue()
+        {
+            var delimiters = _fixture.CreateManyStringsExcludingCharSequences(_illegalDelimiters);
             var input = TestDataGenerator.GetDelimiterString(delimiters);
 
             var actual = _parser.HasSpecifiedDelimiter(input);
@@ -252,9 +289,23 @@ namespace StringCalculator.Tests
         }
 
         [Test]
-        public void UpdateDelimiters_GivenMultipleDelimiter_ChangesDelimiters()
+        public void UpdateDelimiters_GivenMultipleDelimiters_ChangesDelimiters()
         {
             var delimiters = _fixture.CreateManyNonDigitChars().Select(c => c.ToString());
+            var parser = new InputParser();
+            var expected = delimiters.ToList();
+            expected.Add(_newLineDelimiter);
+
+            parser.UpdateDelimiters(delimiters);
+            var actual = parser.GetDelimiters();
+
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void UpdateDelimiters_GivenMultipleMultiCharDelimiters_ChangesDelimiters()
+        {
+            var delimiters = _fixture.CreateManyStringsExcludingCharSequences(_illegalDelimiters).ToList();
             var parser = new InputParser();
             var expected = delimiters.ToList();
             expected.Add(_newLineDelimiter);

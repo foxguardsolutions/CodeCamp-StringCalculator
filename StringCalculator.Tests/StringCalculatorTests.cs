@@ -22,10 +22,10 @@ namespace StringCalculator.Tests
         [SetUp]
         public void SetUp()
         {
-            _defaultDelimiter = InputParser.DEFAULT_DELIMITER;
             _maxInputValue = StringCalculator.CALCULATOR_INPUT_UPPER_LIMIT;
+            _defaultDelimiter = InputParser.DEFAULT_DELIMITER;
             _negativeNumberMessage = StringCalculator.NEGATIVE_NUMBER_MSG;
-            _newLineDelimiter = InputParser.NEW_LINE_DELIMITER.ToString();
+            _newLineDelimiter = InputParser.NEW_LINE_DELIMITER;
             _illegalDelimiters = new[] { InputParser.DELIMITER_OPENER, InputParser.DELIMITER_CLOSER };
             _fixture = new Fixture();
             _calculator = new StringCalculator();
@@ -96,7 +96,7 @@ namespace StringCalculator.Tests
         public void Add_GivenUnknownNumberStringWithDefaultAndNewLineDelimiters_ReturnsSumOfNumbers(int count)
         {
             var ints = _fixture.CreateManyIntsInRange(0, _maxInputValue, count).ToArray();
-            var numbers = TestDataGenerator.GetNumberString(ints, new[] { _defaultDelimiter[0], _newLineDelimiter[0] });
+            var numbers = TestDataGenerator.GetNumberString(ints, new[] { _defaultDelimiter, _newLineDelimiter });
             var expected = ints.Sum();
             
             var actual = _calculator.Add(numbers);
@@ -109,6 +109,21 @@ namespace StringCalculator.Tests
         {
             var ints = _fixture.CreateManyIntsInRange(0, _maxInputValue, count);
             var delimiters = _fixture.CreateManyNonDigitChars(count);
+            var delimiterString = TestDataGenerator.GetDelimiterString(delimiters);
+            var numberString = TestDataGenerator.GetNumberString(ints, delimiters);
+            var input = delimiterString + numberString;
+            var expected = ints.Sum();
+
+            var actual = _calculator.Add(input);
+
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        [TestCaseSource(nameof(NumberCounts))]
+        public void Add_GivenUnknownNumberStringWithMultipleSpecifiedMultiCharDelimiters_ReturnsSumOfNumbers(int count)
+        {
+            var ints = _fixture.CreateManyIntsInRange(0, _maxInputValue, count);
+            var delimiters = _fixture.CreateManyStringsExcludingCharSequences(_illegalDelimiters, count);
             var delimiterString = TestDataGenerator.GetDelimiterString(delimiters);
             var numberString = TestDataGenerator.GetNumberString(ints, delimiters);
             var input = delimiterString + numberString;

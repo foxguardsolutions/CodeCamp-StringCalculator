@@ -13,8 +13,13 @@ namespace StringCalculator.Tests
             return InputParser.DELIMITER_DEFINER + InputParser.DELIMITER_OPENER + delimiter
                 + InputParser.DELIMITER_CLOSER + InputParser.NEW_LINE_DELIMITER;
         }
-        
+
         public static string GetDelimiterString(IEnumerable<char> delimiters)
+        {
+            return GetDelimiterString(delimiters.Select(c => c.ToString()));
+        }
+
+        public static string GetDelimiterString(IEnumerable<string> delimiters)
         {
             var delimiterString = InputParser.DELIMITER_DEFINER;
 
@@ -25,6 +30,11 @@ namespace StringCalculator.Tests
         }
 
         public static string GetNumberString(IEnumerable<int> ints, IEnumerable<char> delimiters)
+        {
+            return GetNumberString(ints, delimiters.Select(c => c.ToString()));
+        }
+
+        public static string GetNumberString(IEnumerable<int> ints, IEnumerable<string> delimiters)
         {
             var delimList = delimiters.ToList();
             var i = 0;

@@ -27,6 +27,11 @@ namespace StringCalculator.Tests
             return fixture.Build<char>().FromFactory(() => fixture.CreateNonDigitChar()).CreateMany(count);
         }
 
+        public static IEnumerable<string> CreateManyStringsExcludingCharSequences(this Fixture fixture, string[] omittedSequences, int count = 3)
+        {
+            return fixture.Build<string>().FromFactory(() => fixture.CreateStringExcludingCharSequences(omittedSequences)).CreateMany(count);
+        }
+
         public static int CreateIntInRange(this Fixture fixture, int minValue, int maxValue)
         {
             if (minValue >= maxValue)
