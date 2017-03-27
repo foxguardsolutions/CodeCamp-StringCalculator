@@ -11,7 +11,6 @@ namespace StringCalculator
         internal const int CALCULATOR_INPUT_UPPER_LIMIT = 1000;
         internal const string NEGATIVE_NUMBER_MSG = "Negatives not allowed ";
 
-        private const string COMMA = ",";
         private const string NEGATIVE_NUMBER_START = "-";
         
         public int Add(string input)
@@ -19,7 +18,7 @@ namespace StringCalculator
             var parser = new InputParser();
 
             if (parser.HasSpecifiedDelimiter(input))
-                parser.UpdateDelimiter(parser.GetDelimiterFromInput(input));
+                parser.UpdateDelimiters(parser.GetDelimitersFromInput(input));
 
             return AddNumbersInAString(parser.GetNumberStringFromInput(input), parser);
         }
@@ -48,7 +47,7 @@ namespace StringCalculator
 
             if (negativeNumbers.Any())
                 throw new NegativeNumberException(NEGATIVE_NUMBER_MSG
-                    + string.Join(COMMA, negativeNumbers));
+                    + string.Join(InputParser.DEFAULT_DELIMITER, negativeNumbers));
         }
     }
 }

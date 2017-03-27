@@ -12,7 +12,7 @@ namespace StringCalculator.Tests
     public class StringCalculatorTests
     {
         private int _maxInputValue;
-        private string _comma;
+        private string _defaultDelimiter;
         private string _negativeNumberMessage;
         private string _newLineDelimiter;
         private string[] _illegalDelimiters;
@@ -22,8 +22,8 @@ namespace StringCalculator.Tests
         [SetUp]
         public void SetUp()
         {
+            _defaultDelimiter = InputParser.DEFAULT_DELIMITER;
             _maxInputValue = StringCalculator.CALCULATOR_INPUT_UPPER_LIMIT;
-            _comma = TestDataGenerator.COMMA;
             _negativeNumberMessage = StringCalculator.NEGATIVE_NUMBER_MSG;
             _newLineDelimiter = InputParser.NEW_LINE_DELIMITER.ToString();
             _illegalDelimiters = new[] { InputParser.DELIMITER_OPENER, InputParser.DELIMITER_CLOSER };
@@ -58,8 +58,8 @@ namespace StringCalculator.Tests
             var ints = _fixture.CreateManyIntsInRange(0, _maxInputValue, count);
             var negativeInts = _fixture.CreateManyNegativeInts(count);
             var both = ints.Concat(negativeInts).OrderBy(i => Math.Abs(i));
-            var numbers = string.Join(_comma, both);
-            var expected = _negativeNumberMessage + string.Join(_comma, negativeInts.OrderBy(i => Math.Abs(i)));
+            var numbers = string.Join(_defaultDelimiter, both);
+            var expected = _negativeNumberMessage + string.Join(_defaultDelimiter, negativeInts.OrderBy(i => Math.Abs(i)));
 
             var ex = Assert.Throws<NegativeNumberException>(() => _calculator.Add(numbers));
             var actual = ex.Message;
@@ -71,7 +71,7 @@ namespace StringCalculator.Tests
         public void Add_GivenUnknownNegativeNumberString_ThrowsErrorForNegativeNumbers(int count)
         {
             var negativeInts = _fixture.CreateManyNegativeInts(count);
-            var negativeNumbers = string.Join(_comma, negativeInts);
+            var negativeNumbers = string.Join(_defaultDelimiter, negativeInts);
             var expected = _negativeNumberMessage + negativeNumbers;
 
             var ex = Assert.Throws<NegativeNumberException>(() => _calculator.Add(negativeNumbers));
@@ -81,10 +81,10 @@ namespace StringCalculator.Tests
         }
 
         [TestCaseSource(nameof(NumberCounts))]
-        public void Add_GivenUnknownNumberStringWithCommaDelimiter_ReturnsSumOfNumbers(int count)
+        public void Add_GivenUnknownNumberStringWithDefaultDelimiter_ReturnsSumOfNumbers(int count)
         {
             var ints = _fixture.CreateManyIntsInRange(0, _maxInputValue, count);
-            var numbers = string.Join(_comma, ints);
+            var numbers = string.Join(_defaultDelimiter, ints);
             var expected = ints.Sum();
 
             var actual = _calculator.Add(numbers);
@@ -93,15 +93,28 @@ namespace StringCalculator.Tests
         }
 
         [TestCaseSource(nameof(NumberCounts))]
-        public void Add_GivenUnknownNumberStringWithCommaAndNewLineDelimiters_ReturnsSumOfNumbers(int count)
+        public void Add_GivenUnknownNumberStringWithDefaultAndNewLineDelimiters_ReturnsSumOfNumbers(int count)
         {
             var ints = _fixture.CreateManyIntsInRange(0, _maxInputValue, count).ToArray();
-            var numbers = "";
+            var numbers = TestDataGenerator.GetNumberString(ints, new[] { _defaultDelimiter[0], _newLineDelimiter[0] });
             var expected = ints.Sum();
-            for (int i = 0; i < ints.Length; i++)
-                numbers += ints[i] + (i % 2 == 0 ? _comma : _newLineDelimiter);
-
+            
             var actual = _calculator.Add(numbers);
+
+            Assert.That(actual, Is.EqualTo(expected));
+        }
+
+        [TestCaseSource(nameof(NumberCounts))]
+        public void Add_GivenUnknownNumberStringWithMultipleSpecifiedDelimiters_ReturnsSumOfNumbers(int count)
+        {
+            var ints = _fixture.CreateManyIntsInRange(0, _maxInputValue, count);
+            var delimiters = _fixture.CreateManyNonDigitChars(count);
+            var delimiterString = TestDataGenerator.GetDelimiterString(delimiters);
+            var numberString = TestDataGenerator.GetNumberString(ints, delimiters);
+            var input = delimiterString + numberString;
+            var expected = ints.Sum();
+
+            var actual = _calculator.Add(input);
 
             Assert.That(actual, Is.EqualTo(expected));
         }
@@ -124,10 +137,9 @@ namespace StringCalculator.Tests
             var ints = _fixture.CreateManyIntsInRange(0, _maxInputValue, count).ToArray();
             var delimiter = _fixture.CreateNonDigitChar();
             var numbers = TestDataGenerator.GetSingleCharDelimiterString(delimiter);
+            numbers += TestDataGenerator.GetNumberString(ints, new[] { delimiter, _newLineDelimiter[0] });
             var expected = ints.Sum();
-            for (int i = 0; i < ints.Length; i++)
-                numbers += ints[i] + (i % 2 == 0 ? delimiter.ToString() : _newLineDelimiter);
-
+            
             var actual = _calculator.Add(numbers);
 
             Assert.That(actual, Is.EqualTo(expected));
@@ -139,7 +151,7 @@ namespace StringCalculator.Tests
             var aboveLimitInts = _fixture.CreateManyIntsInRange(_maxInputValue + 1, int.MaxValue, count);
             var belowLimitInts = _fixture.CreateManyIntsInRange(0, _maxInputValue, count);
             var both = aboveLimitInts.Concat(belowLimitInts);
-            var numbers = string.Join(_comma, both);
+            var numbers = string.Join(_defaultDelimiter, both);
             var expected = belowLimitInts.Sum();
 
             var actual = _calculator.Add(numbers);
@@ -151,7 +163,7 @@ namespace StringCalculator.Tests
         public void Add_GivenUnknownNumberStringWithNumbersAboveInputUpperLimit_Returns0(int count)
         {
             var aboveLimitInts = _fixture.CreateManyIntsInRange(_maxInputValue + 1, int.MaxValue, count);
-            var numbers = string.Join(_comma, aboveLimitInts);
+            var numbers = string.Join(_defaultDelimiter, aboveLimitInts);
             var expected = 0;
 
             var actual = _calculator.Add(numbers);
@@ -160,7 +172,7 @@ namespace StringCalculator.Tests
         }
         
         [TestCaseSource(nameof(NumberCounts))]
-        public void Add_GivenUnknownNumberStringWithSpecifiedDelimiters_ReturnsSumOfNumbers(int count)
+        public void Add_GivenUnknownNumberStringWithSpecifiedDelimiter_ReturnsSumOfNumbers(int count)
         {
             var ints = _fixture.CreateManyIntsInRange(0, _maxInputValue, count);
             var delimiter = _fixture.CreateNonDigitChar();
@@ -174,7 +186,7 @@ namespace StringCalculator.Tests
         }
 
         [TestCaseSource(nameof(NumberCounts))]
-        public void Add_GivenUnknownNumberStringWithSpecifiedMultiCharDelimiters_ReturnsSumOfNumbers(int count)
+        public void Add_GivenUnknownNumberStringWithSpecifiedMultiCharDelimiter_ReturnsSumOfNumbers(int count)
         {
             var ints = _fixture.CreateManyIntsInRange(0, _maxInputValue, count);
             var delimiter = _fixture.CreateStringExcludingCharSequences(_illegalDelimiters);

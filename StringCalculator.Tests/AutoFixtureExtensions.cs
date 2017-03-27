@@ -22,6 +22,11 @@ namespace StringCalculator.Tests
             return fixture.Build<int>().FromFactory(() => fixture.CreateNegativeInt()).CreateMany(count);
         }
 
+        public static IEnumerable<char> CreateManyNonDigitChars(this Fixture fixture, int count = 3)
+        {
+            return fixture.Build<char>().FromFactory(() => fixture.CreateNonDigitChar()).CreateMany(count);
+        }
+
         public static int CreateIntInRange(this Fixture fixture, int minValue, int maxValue)
         {
             if (minValue >= maxValue)
